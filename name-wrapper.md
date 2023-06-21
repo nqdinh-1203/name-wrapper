@@ -23,7 +23,7 @@
 ## Introduction
 Trước khi chúng tôi đi sâu vào **Name Wrapper**, hãy tóm tắt ngắn gọn một số khái niệm ENS cơ bản sẽ cung cấp một số context hữu ích.
 
-**Registry** là contract cốt lõi ở trung tâm của giải pháp ENS. Tất cả các tra cứu ENS bắt đầu bằng cách truy vấn registry. Registry không chỉ dành cho các tên second-level cua .eth (như `name.eth`) mà còn cho tất cả các tên ENS (các tên phụ như `sub.name.eth` và cả các tên DNS như `domain.xyz`). Chủ sở hữu tên trong registry còn được gọi là Controller hoặc Manager của tên.
+**Registry** là contract cốt lõi ở trung tâm của giải pháp ENS. Tất cả các tra cứu ENS bắt đầu bằng cách truy vấn registry. Registry không chỉ dành cho các tên second-level cua .eth (như `name.eth`) mà còn cho tất cả các tên ENS (các subname như `sub.name.eth` và cả các tên DNS như `domain.xyz`). Chủ sở hữu tên trong registry còn được gọi là Controller hoặc Manager của tên.
 
 **.eth Registrar** dành riêng cho đăng ký tên second-level .eth. Đây thực chất là một registrar cho tên miền phụ cho TLD (top-level domain) .eth. Khi bạn đăng ký một tên .eth, registrar sẽ cấp cho bạn một ERC-721 NFT.
 
@@ -31,14 +31,14 @@ Chủ sở hữu của NFT đó còn được gọi là Registrant hoặc Owner 
 
 ![Alt text](image.png)
 
-Có thể thấy, không có Name Wrapper, hiện tại chỉ có các tên sencond-level .eth là NFT. Theo mặc định, tên phụ và miền DNS không có NFT được liên kết với chúng, trừ khi hợp đồng tùy chỉnh được tạo cho mục đích đó.
+Có thể thấy, không có Name Wrapper, hiện tại chỉ có các tên sencond-level .eth là NFT. Theo mặc định, subname và miền DNS không có NFT được liên kết với chúng, trừ khi hợp đồng tùy chỉnh được tạo cho mục đích đó.
 
 ![Alt text](image-1.png)
 
 ## The ENS Name Wrapper
 ![Alt text](image-2.png)
 
-Name Wrapper bao bọc một tên ENS thành một ERC-1155 NFT mới. Bất kỳ tên ENS nào cũng có thể được bao bọc, cho dù đó là tên .eth hay tên miền DNS hay thậm chí là bất kỳ tên phụ nào!
+Name Wrapper bao bọc một tên ENS thành một ERC-1155 NFT mới. Bất kỳ tên ENS nào cũng có thể được bao bọc, cho dù đó là tên .eth hay tên miền DNS hay thậm chí là bất kỳ subname nào!
 
 Bạn có thể lấy tên `name.eth`…
 
@@ -52,7 +52,7 @@ Hãy lấy subname `sub1.name.eth` của chúng ta từ phía trên và bọc n�
 
 ![Alt text](image-5.png)
 
-Bây giờ tên phụ cũng là một ERC-1155 NFT được bao bọc!
+Bây giờ subname cũng là một ERC-1155 NFT được bao bọc!
 
 Những dòng bạn nhìn thấy đại diện cho cái gọi là "permission fuses" cho tên ENS được bao bọc của bạn, mà tôi sẽ giải thích một chút.
 
@@ -70,7 +70,7 @@ Trước đây, không có NFT nào cả (ít nhất là đối với tên con v
 
 Sau khi bạn đặt tên, về mặt kỹ thuật, Owner trong Registry hiện là Name Wrapper contract. Điều đó có nghĩa là bạn không thể tương tác trực tiếp với ENS Registry cho tên đó vì bạn không phải là Owner.
 
-Tuy nhiên, Name Wrapper contrat cung cấp tất cả các method cần thiết để bạn vẫn có thể tương tác với Registry. Bạn có thể chuyển quyền sở hữu, set reolver/ttl và thậm chí tạo tên phụ giống như bình thường. Trên hết, bất kỳ tên phụ nào bạn tạo cũng sẽ được tự động bọc theo mặc định!
+Tuy nhiên, Name Wrapper contrat cung cấp tất cả các method cần thiết để bạn vẫn có thể tương tác với Registry. Bạn có thể chuyển quyền sở hữu, set reolver/ttl và thậm chí tạo subname giống như bình thường. Trên hết, bất kỳ subname nào bạn tạo cũng sẽ được tự động bọc theo mặc định!
 
 ![Alt text](image-8.png)\
 *Registry Controller of a wrapped subname is now the Name Wrapper contract*
@@ -90,51 +90,51 @@ Ngoài ra còn có các cầu chì đặc biệt xác định mối quan hệ gi
 
 - **Unregistered**: Tên thậm chí chưa được đăng ký/tạo hoặc đã hết hạn.
 - **Unwrapped**: Tên tồn tại và chưa hết hạn (trong trường hợp tên second-level .eth). Name Wrapper contract không có quyền sở hữu tên. Bạn sở hữu tên trong Registry và/hoặc .eth registrar.
-- **Wrapped**: Name Wrapper contract có quyền sở hữu tên (trong Registry/Registrar). Đổi lại, bạn được cấp một ERC-1155 NFT, điều này chứng minh rằng bạn là chủ sở hữu thực sự. Bạn có thể unwrap tên bất kỳ lúc nào, thao tác này sẽ burn ERC-1155 NFT và trả lại quyền sở hữu trong Registry/Registrar cho bạn. Nếu tên của bạn là một tên phụ như `sub.name.eth`, thì owner của `name.eth` về mặt kỹ thuật có thể thay thế tên phụ đó và chuyển nó cho một owner khác. Ngoài ra, parent owner có thể đốt cầu chì *parent-controlled* trong tên của bạn.
+- **Wrapped**: Name Wrapper contract có quyền sở hữu tên (trong Registry/Registrar). Đổi lại, bạn được cấp một ERC-1155 NFT, điều này chứng minh rằng bạn là chủ sở hữu thực sự. Bạn có thể unwrap tên bất kỳ lúc nào, thao tác này sẽ burn ERC-1155 NFT và trả lại quyền sở hữu trong Registry/Registrar cho bạn. Nếu tên của bạn là một subname như `sub.name.eth`, thì owner của `name.eth` về mặt kỹ thuật có thể thay thế subname đó và chuyển nó cho một owner khác. Ngoài ra, parent owner có thể đốt cầu chì *parent-controlled* trong tên của bạn.
 - **Emancipated**: owner của parent name không còn có thể thay thế tên này hoặc đốt thêm bất kỳ *cầu chì* trong đó. Tất cả các tên second-level .eth (như `name.eth`) sẽ tự động được đưa vào trạng thái **Giải phóng** khi được bọc. Owner vẫn có thể *unwrap* và *rewrap* tên.
-- **Locked**: Tên không còn có thể được unwrap. Owner có thể đốt cầu chì *owner-controlled* trong nó. Các cầu chì cho tên phụ (`sub1.name.eth`) của tên này (`name.eth`) cũng có thể bị đốt.
+- **Locked**: Tên không còn có thể được unwrap. Owner có thể đốt cầu chì *owner-controlled* trong nó. Các cầu chì cho subname (`sub1.name.eth`) của tên này (`name.eth`) cũng có thể bị đốt.
 
 ![Alt text](image-9.png)\
 *State Machine for the ENS Name Wrapper*
 
 ## Example - Step By Step
 ### Wrapped Subnames
-Giả sử bạn có `name.eth` và `sub1.name.eth`, cả hai đều được bọc. Bạn đã *lock* `name.eth`, nhưng chưa có cầu chì nào bị đốt trên tên phụ.
+Giả sử bạn có `name.eth` và `sub1.name.eth`, cả hai đều được bọc. Bạn đã *lock* `name.eth`, nhưng chưa có cầu chì nào bị đốt trên subname.
 
-Tên phụ được **Bọc** nhưng chưa được **Giải phóng**, vì vậy parent owner vẫn có toàn quyền kiểm soát. Kiểm tra sơ đồ bên dưới, xem có mỏ neo ở phía trên bên trái của tên phụ không? Điều này có nghĩa là parent owner vẫn có thể kiểm soát tên phụ. Nó có thể đốt cầu chì *Parent-Controlled* hoặc thậm chí có thể thay thế hoàn toàn tên phụ nếu muốn.
+subname được **Bọc** nhưng chưa được **Giải phóng**, vì vậy parent owner vẫn có toàn quyền kiểm soát. Kiểm tra sơ đồ bên dưới, xem có mỏ neo ở phía trên bên trái của subname không? Điều này có nghĩa là parent owner vẫn có thể kiểm soát subname. Nó có thể đốt cầu chì *Parent-Controlled* hoặc thậm chí có thể thay thế hoàn toàn subname nếu muốn.
 
 ![Alt text](image-10.png)
 
 ### Burning Parent-Controlled Fuses
-Khi ở trạng thái này, parent owner có thể đốt cầu chì *Parent-Controlled* trong khi tiếp tục có toàn quyền kiểm soát tên phụ.
+Khi ở trạng thái này, parent owner có thể đốt cầu chì *Parent-Controlled* trong khi tiếp tục có toàn quyền kiểm soát subname.
 
-Có tổng số 3 cầu chì *Parent-Controlled* được xác định trước, và sau đó có 13 cầu chì không xác định mà bạn có thể sử dụng theo ý muốn. Một cách để nghĩ về những cầu chì này là "đặc quyền" cho owner tên phụ.
+Có tổng số 3 cầu chì *Parent-Controlled* được xác định trước, và sau đó có 13 cầu chì không xác định mà bạn có thể sử dụng theo ý muốn. Một cách để nghĩ về những cầu chì này là "đặc quyền" cho owner subname.
 
-***Ví dụ***: nếu bạn đang sử dụng tên phụ ENS để cấp vé cho một sự kiện, thì bạn có thể sử dụng các cầu chì *Parent-Controlled* này để mở khóa các đặc quyền, chẳng hạn như khả năng đổi một số quà tặng hoặc tham gia một sự kiện đặc biệt (thậm chí có thể tự động tích hợp với một trong những khóa cửa thông minh đó khi người đó chạm vào thẻ truy cập!).
+***Ví dụ***: nếu bạn đang sử dụng subname ENS để cấp vé cho một sự kiện, thì bạn có thể sử dụng các cầu chì *Parent-Controlled* này để mở khóa các đặc quyền, chẳng hạn như khả năng đổi một số quà tặng hoặc tham gia một sự kiện đặc biệt (thậm chí có thể tự động tích hợp với một trong những khóa cửa thông minh đó khi người đó chạm vào thẻ truy cập!).
 
-Tôi sẽ cho thấy một trong các cầu chì *Parent-Controlled* đang bị đốt trong sơ đồ bên dưới. Trong trường hợp này, đó là cầu chì *CAN_EXTEND_EXPIRY*, cho phép owner tên phụ kéo dài thời hạn sử dụng của chính họ (có một phần sau sẽ đề cập đến tất cả các cầu chì và tác dụng của chúng).
+Tôi sẽ cho thấy một trong các cầu chì *Parent-Controlled* đang bị đốt trong sơ đồ bên dưới. Trong trường hợp này, đó là cầu chì *CAN_EXTEND_EXPIRY*, cho phép owner subname kéo dài thời hạn sử dụng của chính họ (có một phần sau sẽ đề cập đến tất cả các cầu chì và tác dụng của chúng).
 
 ![Alt text](image-11.png)
 
 ### Burning the “Parent Cannot Control” Fuse
-Để giải phóng tên phụ, hãy đốt cầu chì "Parent Cannot Control" đặc biệt.
+Để giải phóng subname, hãy đốt cầu chì "Parent Cannot Control" đặc biệt.
 
-Sau khi đốt, parent sẽ không thể đốt thêm cầu chì nào nữa. Chủ sở hữu của parent name cũng sẽ không thể thay thế tên phụ.
+Sau khi đốt, parent sẽ không thể đốt thêm cầu chì nào nữa. Chủ sở hữu của parent name cũng sẽ không thể thay thế subname.
 
 Hãy nhớ rằng mỏ neo ở trên cùng bên trái của sơ đồ? Đốt cầu chì PCC sẽ thổi bay điều đó! Không có cái mỏ neo đó, child sẽ rời xa parent và cắt đứt tất cả những sợi dây còn lại. Vì vậy, parent owner sẽ không còn quyền kiểm soát đối với child này!
 
-Ngoài ra, thấy cầu chì khác đi xuống bên dưới PCC k? Nó cũng sẽ "phá" một phần bức tường, trao cho chủ sở hữu tên phụ quyền truy cập vào “hộp diêm” của chính họ! Giờ đây, owner tên phụ sẽ có thể tự đốt cầu chì.
+Ngoài ra, thấy cầu chì khác đi xuống bên dưới PCC k? Nó cũng sẽ "phá" một phần bức tường, trao cho chủ sở hữu subname quyền truy cập vào “hộp diêm” của chính họ! Giờ đây, owner subname sẽ có thể tự đốt cầu chì.
 
 ![Alt text](image-12.png)
 
 ### Emancipated Subnames
-Tên phụ `sub1.name.eth` hiện đã được giải phóng.
+subname `sub1.name.eth` hiện đã được giải phóng.
 
-Parent không còn có thể đốt bất kỳ cầu chì nào hoặc thay thế tên phụ (cho đến khi hết hạn).
+Parent không còn có thể đốt bất kỳ cầu chì nào hoặc thay thế subname (cho đến khi hết hạn).
 
-Mặc dù vậy, tên phụ vẫn chưa bị **Lock**, vì vậy owner của tên phụ vẫn có thể *unwrap* tên nếu họ muốn! Nếu tên được *unwrap* ra và sau đó được *rewrap*, mọi thứ sẽ vẫn ở trạng thái **Giải phóng** giống như các ngòi nổ đã được đốt cháy.
+Mặc dù vậy, subname vẫn chưa bị **Lock**, vì vậy owner của subname vẫn có thể *unwrap* tên nếu họ muốn! Nếu tên được *unwrap* ra và sau đó được *rewrap*, mọi thứ sẽ vẫn ở trạng thái **Giải phóng** giống như các ngòi nổ đã được đốt cháy.
 
-Vì tên này chưa được **Lock** nên owner của tên phụ không thể đốt bất kỳ cầu chì nào khác (ngoài "Cannot Unwrap"). Owner cũng không thể đốt bất kỳ cầu chì nào trên bất kỳ tên phụ nào của chính nó.
+Vì tên này chưa được **Lock** nên owner của subname không thể đốt bất kỳ cầu chì nào khác (ngoài "Cannot Unwrap"). Owner cũng không thể đốt bất kỳ cầu chì nào trên bất kỳ subname nào của chính nó.
 
 Xem phần bên dưới hiện có màu xanh lá cây? Giờ đây, parent đã đốt cháy PCC, owner có quyền truy cập vào “hộp diêm” của riêng mình và có thể bắt đầu chơi với lửa!
 
@@ -152,9 +152,9 @@ Bạn có thấy bó thuốc nổ có chữ "CU" bên cạnh không? Nó sẽ n�
 ![Alt text](image-14.png)
 
 ### Locked Subnames
-Tên phụ `sub1.name.eth` hiện đã bị khóa. Điều này có nghĩa là tên không còn có thể được *unwrap*.
+subname `sub1.name.eth` hiện đã bị khóa. Điều này có nghĩa là tên không còn có thể được *unwrap*.
 
-Bây giờ tên đã bị **Lock**, owner có thể đốt các cầu chì "Owner-Controlled" khác. Chủ sở hữu cũng có thể đốt cầu chì cho bất kỳ tên phụ nào của riêng mình.
+Bây giờ tên đã bị **Lock**, owner có thể đốt các cầu chì "Owner-Controlled" khác. Chủ sở hữu cũng có thể đốt cầu chì cho bất kỳ subname nào của riêng mình.
 
 Có tổng số 7 cầu chì "Owner-Controlled" được xác định trước và sau đó có 9 cầu chì không xác định mà bạn có thể sử dụng theo cách mình muốn.
 
@@ -170,9 +170,9 @@ Giờ đây, tên không thể được chuyển nhượng/bán và resolver con
 ### Burning the “Cannot Burn Fuses” Fuse
 Nếu bạn đốt cầu chì đặc biệt "Cannot Burn Fuses”", thì không thể đốt cầu chì nào nữa trong tên.
 
-Parent owner có thể đốt cầu chì này trên tên phụ để đảm bảo rằng một số quyền vẫn "được mở".
+Parent owner có thể đốt cầu chì này trên subname để đảm bảo rằng một số quyền vẫn "được mở".
 
-Owner của tên cũng có thể chọn đốt nó. Ví dụ: nếu tên sử dụng subdomain registrar, owner có thể để “Cannot Create Subname” không cháy, sau đó đốt cầu chì "Cannot Burn Fuses" để đảm bảo rằng tên phụ mới luôn có thể được đăng ký.
+Owner của tên cũng có thể chọn đốt nó. Ví dụ: nếu tên sử dụng subdomain registrar, owner có thể để “Cannot Create Subname” không cháy, sau đó đốt cầu chì "Cannot Burn Fuses" để đảm bảo rằng subname mới luôn có thể được đăng ký.
 
 Bạn có thấy gói thuốc nổ còn lại có chữ “CBF” bên cạnh không? Khi điều đó xảy ra, tất cả các Cầu chì do owner kiểm soát khác sẽ không thể truy cập được. Tôi đã khoanh tròn nó màu xanh bên dưới:
 
@@ -183,7 +183,7 @@ Cầu chì "Cannot Burn Fuses" hiện đã bị đốt cháy.
 
 Các cầu chì cho tên hiện đã bị đóng băng hoàn toàn cho đến khi hết hạn. Bất kỳ cầu chì nào đã cháy trước đó sẽ vẫn ở trạng thái đã cháy đó, nhưng bây giờ không thể đốt cháy cầu chì nào khác trên tên này.
 
-Tuy nhiên, owner vẫn có thể đốt cháy cầu chì của bất kỳ tên phụ nào, giả sử rằng nó vẫn chưa giải phóng chúng.
+Tuy nhiên, owner vẫn có thể đốt cháy cầu chì của bất kỳ subname nào, giả sử rằng nó vẫn chưa giải phóng chúng.
 
 ![Alt text](image-18.png)
 
@@ -200,25 +200,35 @@ Ngoài ra, cầu chì CU chỉ có thể được đốt cháy nếu PCC đã đ
 
 ![Alt text](image-19.png)
 
-Sau khi đốt cháy các cầu chì đó, tên phụ hiện đã bị Lock.
+Sau khi đốt cháy các cầu chì đó, subname hiện đã bị Lock.
 
 Ngoài ra, cầu chì "Can Extend Expiry" đã bị cháy và cầu chì "Cannot Transfer" cũng bị cháy.
 
-Owner tên phụ vẫn có khả năng đốt các cầu chì khác và tạo tên phụ mới của riêng mình trong trường hợp này. Parent có thể đã quyết định hạn chế mọi thứ hơn nữa bằng cách đốt các cầu chì khác, như "Cannot Create Subname" hoặc "Cannot Burn Fuses".
+Owner subname vẫn có khả năng đốt các cầu chì khác và tạo subname mới của riêng mình trong trường hợp này. Parent có thể đã quyết định hạn chế mọi thứ hơn nữa bằng cách đốt các cầu chì khác, như "Cannot Create Subname" hoặc "Cannot Burn Fuses".
 
-Nhưng bây giờ parent đã đốt PCC, nó đã từ bỏ quyền kiểm soát tên phụ này và nó không còn có thể đốt cháy bất kỳ thứ gì khác.
+Nhưng bây giờ parent đã đốt PCC, nó đã từ bỏ quyền kiểm soát subname này và nó không còn có thể đốt cháy bất kỳ thứ gì khác.
 
 ![Alt text](image-20.png)
 
-Vì vậy, chúng ta vừa xem cách bạn có thể lấy một tên phụ được bọc hiện có và **Giải phóng/Khóa** nó, với các cầu chì bị đốt cháy, tất cả chỉ trong một bước.
+Vì vậy, chúng ta vừa xem cách bạn có thể lấy một subname được bọc hiện có và **Giải phóng/Khóa** nó, với các cầu chì bị đốt cháy, tất cả chỉ trong một bước.
 
 Bạn biết đấy, điều tương tự cũng có thể được thực hiện khi bạn tạo một tên con hoàn toàn mới!
 
-Nếu tên của bạn được bao bọc và bạn tạo một tên phụ mới bên dưới tên đó, thì tên phụ đó cũng sẽ được bao bọc theo mặc định. Đồng thời, trong cùng một transaction, bạn cũng có thể truyền vào danh sách cầu chì mong muốn của mình để đốt (và hết hạn).
+Nếu tên của bạn được bao bọc và bạn tạo một subname mới bên dưới tên đó, thì subname đó cũng sẽ được bao bọc theo mặc định. Đồng thời, trong cùng một transaction, bạn cũng có thể truyền vào danh sách cầu chì mong muốn của mình để đốt (và hết hạn).
 
-Vì vậy, bạn không cần phải tạo một tên phụ và sau đó đốt các cầu chì riêng biệt. Bạn có thể làm mọi thứ trong một giao dịch.
+Vì vậy, bạn không cần phải tạo một subname và sau đó đốt các cầu chì riêng biệt. Bạn có thể làm mọi thứ trong một giao dịch.
 
 ## Example - Multiple Subnames in Various States
+Bây giờ, hãy thu nhỏ một chút và thậm chí tôi sẽ zoom vào `name.eth` wrapped lần này.
+
+Hãy nhớ rằng các tên second-level .eth sẽ tự động được đưa vào trạng thái **Giải phóng** khi chúng được bao bọc. Tuy nhiên, chúng không tự động bị khóa. Khi bạn register/wrap tên second-level .eth, bạn có thể truyền vào bất kỳ cầu chì nào do owner kiểm soát mà bạn muốn đốt để bắt đầu, vì vậy bạn có thể truyền thẳng sang trạng thái **Locked** nếu muốn.
+
+![Alt text](image-21.png)
+
+Như bạn có thể thấy, mỗi subname không nhất thiết phải ở cùng một trạng thái. Một số có thể bị khóa, một số được giải phóng và một số chỉ được bọc. Điều đó hoàn toàn phụ thuộc vào parent name và mức độ quyền hạn hoặc quyền tự do mà họ muốn trao cho subname.
+
+Điều này sẽ phụ thuộc vào trường hợp sử dụng. Chẳng hạn, việc sử dụng subname cho hệ thống bán vé tạm thời sẽ có các ràng buộc khác với subdomain registrar vĩnh viễn.
+
 ## Name Wrapper Fuses
 ## Name Wrapper Expiry
 ## Approved Operators
